@@ -10,20 +10,19 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+
 // Health check
 app.get("/api/inngest", (req, res) => {
-    res.send("✅ Inngest endpoint is live");
-  });
-  
-  // Inngest handler (no Clerk)
-  app.use(
-    "/api/inngest",
-    serve({ client: inngest, functions })
-  );
-  
-  // Apply Clerk only after Inngest routes
-  app.use(clerkMiddleware());  
+  res.send("✅ Inngest endpoint is live");
+});
 
+// Inngest handler (no Clerk in front of it)
+app.use("/api/inngest", serve({ client: inngest, functions }));
+
+// Apply Clerk middleware after Inngest routes
+app.use(clerkMiddleware());
+
+// Root route
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
@@ -43,5 +42,5 @@ const initDB = async () => {
 };
 initDB();
 
-// ❌ Don't use app.listen() → Vercel auto-handles this
-export default app;
+// ✅ Export Express app as Vercel handler
+export default (req, res) => app(req, res);
