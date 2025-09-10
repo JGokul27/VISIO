@@ -13,7 +13,14 @@ app.use(express.json());
 app.use(clerkMiddleware());
 
 // Routes
-app.use("/api/inngest", serve({ client: inngest, functions }));
+// Health check for Inngest
+app.get("/api/inngest", (req, res) => {
+    res.send("✅ Inngest endpoint is live");
+  });
+  
+  // Inngest handler
+  app.use("/api/inngest", serve({ client: inngest, functions }));
+  
 
 app.get("/", (req, res) => {
   res.send("Hello world");
