@@ -10,17 +10,19 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(clerkMiddleware());
-
-// Routes
-// Health check for Inngest
+// Health check
 app.get("/api/inngest", (req, res) => {
     res.send("✅ Inngest endpoint is live");
   });
   
-  // Inngest handler
-  app.use("/api/inngest", serve({ client: inngest, functions }));
+  // Inngest handler (no Clerk)
+  app.use(
+    "/api/inngest",
+    serve({ client: inngest, functions })
+  );
   
+  // Apply Clerk only after Inngest routes
+  app.use(clerkMiddleware());  
 
 app.get("/", (req, res) => {
   res.send("Hello world");
