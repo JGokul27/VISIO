@@ -8,29 +8,31 @@ import { serve } from "inngest/express";
 
 const app = express();
 
+// Middleware
 app.use(express.json());
 app.use(clerkMiddleware());
 
+// Routes
 app.use("/api/inngest", serve({ client: inngest, functions }));
 
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
-// ✅ Ensure DB connects once per cold start
+// ✅ Connect DB only once per cold start
 let isConnected = false;
-const init = async () => {
+const initDB = async () => {
   if (!isConnected) {
     try {
       await connectDB();
       isConnected = true;
-      console.log("MongoDB connected");
+      console.log("✅ MongoDB connected");
     } catch (err) {
-      console.error("MongoDB connection failed:", err);
+      console.error("❌ MongoDB connection failed:", err.message);
     }
   }
 };
-init();
+initDB();
 
-// ✅ No app.listen() here (Vercel handles request/response)
+// ❌ Don't use app.listen() → Vercel auto-handles this
 export default app;
